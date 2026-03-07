@@ -1,4 +1,4 @@
-const User = require("../models/user");
+const User = require("../models/User");
 const OTP = require("../models/OTP");
 const otpGenerator = require("otp-generator");
 const bcrypt = require("bcrypt");
@@ -235,6 +235,7 @@ exports.login = async (req, res) => {
 };
 
 //changePassword
+//TODO: HOMEWORK
 exports.changePassword = async (req, res) => {
     //get data from req body
     //get oldPassword, newPassword, confirmNewPassowrd
