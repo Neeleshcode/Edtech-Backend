@@ -1,102 +1,87 @@
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
-const User = require("../models/User");
-
-//auth
-exports.auth = async (req, res, next) => {
-    try{
-        //extract token
-        const token = req.cookies.token 
-                        || req.body.token 
-                        || req.header("Authorisation").replace("Bearer ", "");
-
-        //if token missing, then return response
-        if(!token) {
-            return res.status(401).json({
-                success:false,
-                message:'TOken is missing',
-            });
-        }
-
-        //verify the token
-        try{
-            const decode =  jwt.verify(token, process.env.JWT_SECRET);
-            console.log(decode);
-            req.user = decode;
-        }
-        catch(err) {
-            //verification - issue
-            return res.status(401).json({
-                success:false,
-                message:'token is invalid',
-            });
-        }
-        next();
-    }
-    catch(error) {  
-        return res.status(401).json({
-            success:false,
-            message:'Something went wrong while validating the token',
-        });
-    }
-}
-
-//isStudent
-exports.isStudent = async (req, res, next) => {
- try{
-        if(req.user.accountType !== "Student") {
-            return res.status(401).json({
-                success:false,
-                message:'This is a protected route for Students only',
-            });
-        }
-        next();
- }
- catch(error) {
-    return res.status(500).json({
-        success:false,
-        message:'User role cannot be verified, please try again'
-    })
- }
-}
-
-
-//isInstructor
-exports.isInstructor = async (req, res, next) => {
-    try{
-           if(req.user.accountType !== "Instructor") {
-               return res.status(401).json({
-                   success:false,
-                   message:'This is a protected route for Instructor only',
-               });
-           }
-           next();
-    }
-    catch(error) {
-       return res.status(500).json({
-           success:false,
-           message:'User role cannot be verified, please try again'
-       })
-    }
-   }
-
-
-//isAdmin
-exports.isAdmin = async (req, res, next) => {
-    try{    
-           console.log("Printing AccountType ", req.user.accountType);
-           if(req.user.accountType !== "Admin") {
-               return res.status(401).json({
-                   success:false,
-                   message:'This is a protected route for Admin only',
-               });
-           }
-           next();
-    }
-    catch(error) {
-       return res.status(500).json({
-           success:false,
-           message:'User role cannot be verified, please try again'
-       })
-    }
-   }
+exports.courseEnrollmentEmail = (courseName, name) => {
+    return `<!DOCTYPE html>
+    <html>
+    
+    <head>
+        <meta charset="UTF-8">
+        <title>Course Registration Confirmation</title>
+        <style>
+            body {
+                background-color: #ffffff;
+                font-family: Arial, sans-serif;
+                font-size: 16px;
+                line-height: 1.4;
+                color: #333333;
+                margin: 0;
+                padding: 0;
+            }
+    
+    
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                text-align: center;
+            }
+    
+            .logo {
+                max-width: 200px;
+                margin-bottom: 20px;
+            }
+    
+            .message {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 20px;
+            }
+    
+            .body {
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+    
+            .cta {
+                display: inline-block;
+                padding: 10px 20px;
+                background-color: #FFD60A;
+                color: #000000;
+                text-decoration: none;
+                border-radius: 5px;
+                font-size: 16px;
+                font-weight: bold;
+                margin-top: 20px;
+            }
+    
+            .support {
+                font-size: 14px;
+                color: #999999;
+                margin-top: 20px;
+            }
+    
+            .highlight {
+                font-weight: bold;
+            }
+        </style>
+    
+    </head>
+    
+    <body>
+        <div class="container">
+            <a href="https://studynotion-edtech-project.vercel.app"><img class="logo" src="https://i.ibb.co/7Xyj3PC/logo.png"
+                    alt="StudyNotion Logo"></a>
+            <div class="message">Course Registration Confirmation</div>
+            <div class="body">
+                <p>Dear ${name},</p>
+                <p>You have successfully registered for the course <span class="highlight">"${courseName}"</span>. We
+                    are excited to have you as a participant!</p>
+                <p>Please log in to your learning dashboard to access the course materials and start your learning journey.
+                </p>
+                <a class="cta" href="https://studynotion-edtech-project.vercel.app/dashboard">Go to Dashboard</a>
+            </div>
+            <div class="support">If you have any questions or need assistance, please feel free to reach out to us at <a
+                    href="mailto:info@studynotion.com">info@studynotion.com</a>. We are here to help!</div>
+        </div>
+    </body>
+    
+    </html>`;
+  };
